@@ -57,4 +57,8 @@ public class MusicService {
             return 0;
         }
     }
+
+    public void deleteFavorite(String id){
+        albumsRepo.deleteById(id);
+    }
 }
