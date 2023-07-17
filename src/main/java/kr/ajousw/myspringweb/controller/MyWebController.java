@@ -19,68 +19,34 @@ import kr.ajousw.myspringweb.dto.FavoriteMusicRequestDto;
 import kr.ajousw.myspringweb.dto.MusicList;
 import kr.ajousw.myspringweb.entity.FavoriteMusic;
 import kr.ajousw.myspringweb.repository.FavoriteRepository;
+import kr.ajousw.myspringweb.service.MusicService;
 
 @RestController
 public class MyWebController {
     @Autowired
-    FavoriteRepository albumsRepo;
+    MusicService service;
 
-    @GetMapping("/musicSearch/{term}")
-    public MusicList musicSearchByPath(@PathVariable String term) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        try {
-            String response = restTemplate
-                    .getForObject("https://itunes.apple.com/search?term=" + term + "&entity=album", String.class);
-            ObjectMapper mapper = new ObjectMapper();
-            MusicList list = mapper.readValue(response, MusicList.class);
-            System.out.println(list.getResultCount());
-            return list;
-        } catch (IOException e) {
-            System.out.println(e.toString());
-            return null;
-        }
+    @GetMapping("/musicSearch/{name}")
+    public MusicList musicSearchByPath(@PathVariable String name) {
+        return service.searchMusic(name);
 
     }
 
     @GetMapping("/musicSearch")
-    public MusicList musicSearchByParam(@RequestParam String term) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        try {
-            String response = restTemplate
-                    .getForObject("https://itunes.apple.com/search?term=" + term + "&entity=album", String.class);
-            ObjectMapper mapper = new ObjectMapper();
-            MusicList list = mapper.readValue(response, MusicList.class);
-            System.out.println(list.getResultCount());
-            return list;
-        } catch (IOException e) {
-            System.out.println(e.toString());
-            return null;
-        }
+    public MusicList musicSearchByParam(@RequestParam String name) {
+        return service.searchMusic(name);
+       
     }
 
     @GetMapping(value = "/likes")
     public List<FavoriteMusic> getLikes() {
-
-        try {
-            return albumsRepo.findAll();
-
-        } catch (Exception e) {
-            System.out.println(e.toString());
-            return null;
-        }
+        return service.getLikes();
     }
 
     @PostMapping(value = "/likes")
     @Transactional
     public int postLikes(@RequestBody FavoriteMusicRequestDto favorite) {
-        FavoriteMusic music = albumsRepo.save(favorite.toEntity());
-        if (music != null) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return service.saveFavorite(favorite);
     }
 
 }
