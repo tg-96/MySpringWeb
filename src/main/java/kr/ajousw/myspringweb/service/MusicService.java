@@ -50,6 +50,7 @@ public class MusicService {
     }
 
     public int saveFavorite(FavoriteMusicRequestDto favorite){
+        
         FavoriteMusic music = albumsRepo.save(favorite.toEntity());
         if (music != null) {
             return 1;
